@@ -6,8 +6,9 @@ resource "oci_containerengine_cluster" "demo_cluster" {
   #Required
   compartment_id     = var.compartment_ocid
   kubernetes_version = var.oke_cluster["k8s_version"]
+  #kubernetes_version = data.oci_containerengine_cluster_option.demo_cluster_option.kubernetes_versions.0
   name               = var.oke_cluster["name"]
-  vcn_id             = var.vcn
+  vcn_id             = var.vcn  
 
   #Optional
   options {
@@ -38,9 +39,14 @@ resource "oci_containerengine_node_pool" "demo_node_pool" {
   compartment_id     = var.compartment_ocid
   kubernetes_version = var.oke_cluster["k8s_version"]
   name               = var.oke_cluster["pool_name"]
-  node_image_name    = var.oke_cluster["node_image"]
   node_shape         = var.oke_cluster["node_shape"]
   subnet_ids         = ["${oci_core_subnet.nodepool_subnet_1.id}", "${oci_core_subnet.nodepool_subnet_2.id}"]
+
+  node_source_details {
+    #Required
+    image_id    = data.oci_containerengine_node_pool_option.demo_node_pool_option.sources.0.image_id
+    source_type = data.oci_containerengine_node_pool_option.demo_node_pool_option.sources.0.source_type
+  }
 
   #Optional
   initial_node_labels {
@@ -49,8 +55,8 @@ resource "oci_containerengine_node_pool" "demo_node_pool" {
     value = var.node_pool_initial_node_labels_value
   }
 
-#   quantity_per_subnet = var.node_pool_quantity_per_subnet
-# #  ssh_public_key      = var.node_pool_ssh_public_key
+  quantity_per_subnet = var.node_pool_quantity_per_subnet
+#  ssh_public_key      = var.node_pool_ssh_public_key
 }
 
 
@@ -85,10 +91,10 @@ data "oci_containerengine_node_pool_option" "demo_node_pool_option" {
 }
 
 output "cluster_kubernetes_versions" {
-  value = ["${data.oci_containerengine_cluster_option.demo_cluster_option.kubernetes_versions}"]
+  value = data.oci_containerengine_cluster_option.demo_cluster_option.kubernetes_versions
 }
 
 output "node_pool_kubernetes_version" {
-  value = ["${data.oci_containerengine_node_pool_option.demo_node_pool_option.kubernetes_versions}"]
+  value = data.oci_containerengine_node_pool_option.demo_node_pool_option.kubernetes_versions
 }
 
