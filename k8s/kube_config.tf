@@ -3,7 +3,7 @@ variable "cluster_kube_config_expiration" {
 }
 
 variable "cluster_kube_config_token_version" {
-  default = "1.0.0"
+  default = "2.0.0"
 }
 
 data "oci_containerengine_cluster_kube_config" "demo_cluster_kube_config" {
@@ -16,7 +16,7 @@ data "oci_containerengine_cluster_kube_config" "demo_cluster_kube_config" {
 }
 
 resource "local_file" "demo_cluster_kube_config_file" {
-  content  = "${data.oci_containerengine_cluster_kube_config.demo_cluster_kube_config.content}"
-  filename = "/home/opc/.kube/config"
+  content  = data.oci_containerengine_cluster_kube_config.demo_cluster_kube_config.content
+  filename = "/Users/jushahid/.kube/config"
 }
 
